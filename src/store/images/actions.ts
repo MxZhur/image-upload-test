@@ -1,23 +1,11 @@
-import {ImageFormFieldsAdd, ImageFormFieldsUpdate} from './types';
-
-export const addImageAction = (formData: ImageFormFieldsAdd) =>
+export const appendImagesAction = (urls: string[]) =>
   <const>{
-    type: 'ADD_IMAGE',
-    formData,
+    type: 'APPEND_IMAGES',
+    urls,
   };
 
-export const updateImageAction = (
-  id: string,
-  formData: ImageFormFieldsUpdate,
-) =>
+export const refreshImagesAction = (urls: string[]) =>
   <const>{
-    type: 'UPDATE_IMAGE',
-    id,
-    formData,
-  };
-
-export const deleteImageAction = (id: string) =>
-  <const>{
-    type: 'DELETE_IMAGE',
-    id,
+    type: 'REFRESH_IMAGES',
+    urls,
   };
