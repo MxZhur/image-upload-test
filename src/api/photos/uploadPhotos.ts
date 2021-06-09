@@ -2,13 +2,7 @@ import {axios} from '../axios';
 import {UploadPhotosPayload, UploadPhotosResponse} from './types';
 
 export const uploadPhotos = (payload: UploadPhotosPayload) => {
-  const bodyFormData = new FormData();
-
-  payload.photos.forEach((photo, index) => {
-    bodyFormData.append(`photos[${index}]`, photo);
-  });
-
-  return axios.post<UploadPhotosResponse>('upload', bodyFormData, {
+  return axios.post<UploadPhotosResponse>('upload', payload, {
     headers: {'Content-Type': 'multipart/form-data'},
   });
 };

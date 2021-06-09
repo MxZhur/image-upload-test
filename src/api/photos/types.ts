@@ -5,11 +5,13 @@ export type ImageType = {
 };
 
 export type UploadPhotosPayload = {
-  text: string;
-  photos: ImageType[];
+  photos: (ImageType | null)[];
 };
 
 export type UploadPhotosResponse = {
   result: string;
-  data: string[]; // URLs
+  images: {
+    id: string;
+    uri: string;
+  }[];
 };

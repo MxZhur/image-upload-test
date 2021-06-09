@@ -1,11 +1,7 @@
-export const appendImagesAction = (urls: string[]) =>
+import { ImagePreviewData } from "./types";
+
+export const appendImagesAction = (images: ImagePreviewData[]) =>
   <const>{
     type: 'APPEND_IMAGES',
-    urls,
-  };
-
-export const refreshImagesAction = (urls: string[]) =>
-  <const>{
-    type: 'REFRESH_IMAGES',
-    urls,
+    images,
   };

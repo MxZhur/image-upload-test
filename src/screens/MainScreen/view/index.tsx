@@ -2,9 +2,10 @@ import React from 'react';
 import {FlatList, SafeAreaView, StyleSheet, View} from 'react-native';
 import {ImageThumbnail, PlaceholderMessageView} from '../../../components';
 import {ImageUploadForm} from '../../../containers';
+import {ImagePreviewData} from '../../../store/images/types';
 
 type Props = {
-  uploadedImages: string[];
+  uploadedImages: ImagePreviewData[];
   onThumbnailPress: (item: any) => void;
 };
 
@@ -20,10 +21,10 @@ export const MainScreenView: React.FC<Props> = ({
           horizontal={false}
           numColumns={3}
           data={uploadedImages}
-          renderItem={item => (
+          renderItem={({item}) => (
             <View style={styles.thumbnailWrapper}>
               <ImageThumbnail
-                src={null} // TODO: Replace by the actual image URI
+                src={item.uri}
                 onPress={() => {
                   onThumbnailPress(item);
                 }}

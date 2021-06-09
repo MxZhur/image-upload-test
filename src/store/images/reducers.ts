@@ -8,9 +8,7 @@ export function imagesReducer(
 ) {
   switch (action.type) {
     case 'APPEND_IMAGES':
-      return [...state, ...action.urls];
-    case 'REFRESH_IMAGES':
-      return action.urls;
+      return [...state, ...action.images];
     default:
       return state;
   }
