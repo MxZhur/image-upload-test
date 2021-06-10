@@ -3,21 +3,21 @@ import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import {Alert, Button, ScrollView, StyleSheet, Text, View} from 'react-native';
 import ImageCropPicker, {Image} from 'react-native-image-crop-picker';
 import {uploadPhotos} from '../../api/photos';
-import {ImageType} from '../../api/photos/types';
+import {ImageRequestData} from '../../api/photos/types';
 import {ImageThumbnail} from '../../components';
-import { store } from '../../store';
-import { appendImagesAction } from '../../store/images/actions';
+import {store} from '../../store';
+import {setImagesAction} from '../../store/images/actions';
 
-const NUMBER_OF_IMAGES = 5;
+const NUMBER_OF_IMAGES = 2;
 
 export interface UploadPhotosFormValues {
-  photos: (ImageType | null)[];
+  photos: (ImageRequestData | null)[];
 }
 
 // I don't know why it works like this.
-// TypeScript says I should use (ImageType | null)[],
-// but in fact, the validation function passes (ImageType | null)
-const isArrayFull = (item: (ImageType | null)[]) => {
+// TypeScript says I should use (ImageRequestData | null)[],
+// but in fact, the validation function passes (ImageRequestData | null)
+const isArrayFull = (item: (ImageRequestData | null)[]) => {
   return item?.uri !== undefined && item?.uri !== null;
 };
 
@@ -50,12 +50,14 @@ export const ImageUploadForm: React.FC = () => {
     setLoading(true);
     try {
       const response = await uploadPhotos({
-        photos: data.photos,
+        photos: data.photos.filter(
+          item => item !== null && item.uri !== undefined,
+        ) as ImageRequestData[],
       });
 
-      const newPhotos = response.data.images;      
+      const newPhotos = response.data.images;
 
-      await store.dispatch(appendImagesAction(newPhotos));
+      await store.dispatch(setImagesAction(newPhotos));
       setLoading(false);
     } catch (error) {
       console.warn('UploadPhoto error:', error);
@@ -182,7 +184,11 @@ export const ImageUploadForm: React.FC = () => {
           : ''}
       </Text>
       <View style={styles.submitButton}>
-        <Button title={'Upload'} onPress={handleSubmit(onSubmit)} disabled={loading} />
+        <Button
+          title={'Upload'}
+          onPress={handleSubmit(onSubmit)}
+          disabled={loading}
+        />
       </View>
     </View>
   );

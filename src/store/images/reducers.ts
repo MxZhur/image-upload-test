@@ -7,8 +7,8 @@ export function imagesReducer(
   action: ImagesAction,
 ) {
   switch (action.type) {
-    case 'APPEND_IMAGES':
-      return [...state, ...action.images];
+    case 'SET_IMAGES':
+      return [...action.images];
     default:
       return state;
   }

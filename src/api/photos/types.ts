@@ -1,11 +1,11 @@
-export type ImageType = {
+export type ImageRequestData = {
   name: string;
   uri: string;
   type: string;
 };
 
 export type UploadPhotosPayload = {
-  photos: (ImageType | null)[];
+  photos: ImageRequestData[];
 };
 
 export type UploadPhotosResponse = {

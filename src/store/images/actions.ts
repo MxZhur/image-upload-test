@@ -1,7 +1,7 @@
-import { ImagePreviewData } from "./types";
+import {ImagePreviewData} from './types';
 
-export const appendImagesAction = (images: ImagePreviewData[]) =>
+export const setImagesAction = (images: ImagePreviewData[]) =>
   <const>{
-    type: 'APPEND_IMAGES',
+    type: 'SET_IMAGES',
     images,
   };

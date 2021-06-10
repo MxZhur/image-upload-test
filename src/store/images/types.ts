@@ -1,6 +1,6 @@
-import {appendImagesAction} from './actions';
+import {setImagesAction} from './actions';
 
-export type ImagesAction = ReturnType<typeof appendImagesAction>;
+export type ImagesAction = ReturnType<typeof setImagesAction>;
 
 export type ImagePreviewData = {
   id: string;
