@@ -1,18 +1,15 @@
 import React, {useState} from 'react';
-import {Controller, useFieldArray, useForm} from 'react-hook-form';
-import {Alert, Button, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {useFieldArray, useForm} from 'react-hook-form';
+import {Alert} from 'react-native';
 import ImageCropPicker, {Image} from 'react-native-image-crop-picker';
 import {uploadPhotos} from '../../api/photos';
 import {ImageRequestData} from '../../api/photos/types';
-import {ImageThumbnail} from '../../components';
 import {store} from '../../store';
 import {setImagesAction} from '../../store/images/actions';
+import {UploadPhotosFormValues} from './types';
+import {ImageUploadFormView} from './view';
 
 const NUMBER_OF_IMAGES = 5;
-
-export interface UploadPhotosFormValues {
-  photos: (ImageRequestData | null)[];
-}
 
 // I don't know why it works like this.
 // TypeScript says I should use (ImageRequestData | null)[],
@@ -30,7 +27,6 @@ export const ImageUploadForm: React.FC = () => {
     handleSubmit,
     setValue,
     getValues,
-    clearErrors,
     watch,
   } = useForm<UploadPhotosFormValues>({
     mode: 'onSubmit',
@@ -44,9 +40,9 @@ export const ImageUploadForm: React.FC = () => {
     shouldUnregister: true,
   });
 
-  const watchPhotos = watch('photos');
+  const watchPhotos = watch('photos'); // Necessary for thumbnails re-rendering
 
-  const onSubmit = async (data: UploadPhotosFormValues) => {
+  const submit = async (data: UploadPhotosFormValues) => {
     setLoading(true);
     try {
       const response = await uploadPhotos({
@@ -78,9 +74,18 @@ export const ImageUploadForm: React.FC = () => {
             onPress: () => {
               ImageCropPicker.openCamera({
                 mediaType: 'photo',
-              }).then(image => {
-                setImage(index, image);
-              });
+              })
+                .then(image => {
+                  setImage(index, image);
+                })
+                .catch(error => {
+                  if (error.code !== 'E_PICKER_CANCELLED') {
+                    console.warn(error);
+                    Alert.alert(
+                      'Sorry, there was an issue attempting to get the image you selected. Please try again.',
+                    );
+                  }
+                });
             },
           },
           {
@@ -89,9 +94,18 @@ export const ImageUploadForm: React.FC = () => {
             onPress: () => {
               ImageCropPicker.openPicker({
                 mediaType: 'photo',
-              }).then(image => {
-                setImage(index, image);
-              });
+              })
+                .then(image => {
+                  setImage(index, image);
+                })
+                .catch(error => {
+                  if (error.code !== 'E_PICKER_CANCELLED') {
+                    console.warn(error);
+                    Alert.alert(
+                      'Sorry, there was an issue attempting to get the image you selected. Please try again.',
+                    );
+                  }
+                });
             },
           },
         ],
@@ -129,92 +143,26 @@ export const ImageUploadForm: React.FC = () => {
   const formPhotos = getValues().photos;
 
   return (
-    <View style={styles.uploadForm}>
-      <Text style={styles.text}>{`Upload ${NUMBER_OF_IMAGES} file(s)`}</Text>
-      <ScrollView
-        contentContainerStyle={{
-          marginBottom: 10,
-          // flex: 1,
-          // justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-        horizontal={true}
-        fadingEdgeLength={60}>
-        {images.map((image, index) => {
-          const formImage = formPhotos[index] ?? null;
-
-          return (
-            <Controller
-              defaultValue={fields}
-              control={control}
-              name={`photos.${index}`}
-              key={index}
-              rules={{
-                required: true,
-                min: NUMBER_OF_IMAGES,
-                max: NUMBER_OF_IMAGES,
-                validate: {
-                  isArrayFull,
-                },
-              }}
-              render={() => (
-                <View
-                  style={{
-                    marginHorizontal: 3,
-                  }}>
-                  <ImageThumbnail
-                    key={index.toString()}
-                    size={55}
-                    src={formImage?.uri}
-                    onPress={() => {
-                      if (!loading) {
-                        openPicker(index);
-                      }
-                    }}
-                  />
-                </View>
-              )}
-            />
-          );
-        })}
-      </ScrollView>
-      <Text style={[styles.text, styles.textError]}>
-        {errors.photos
-          ? `You have to upload all ${NUMBER_OF_IMAGES} images.`
-          : ''}
-      </Text>
-      <View style={styles.submitButton}>
-        <Button
-          title={'Upload'}
-          onPress={handleSubmit(onSubmit)}
-          disabled={loading}
-        />
-      </View>
-    </View>
+    <ImageUploadFormView
+      formData={{
+        control,
+        errors,
+        formPhotos,
+        fieldName: 'photos',
+        imageFields: images,
+        formFields: fields,
+        customValidationRules: {
+          isArrayFull,
+        },
+      }}
+      loading={loading}
+      onSubmit={handleSubmit(submit)}
+      onThumbnailPress={index => {
+        if (!loading) {
+          openPicker(index);
+        }
+      }}
+      slots={NUMBER_OF_IMAGES}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  imageInputs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  uploadForm: {
-    padding: 10,
-    minHeight: 125,
-    backgroundColor: 'white',
-    elevation: 10,
-    alignSelf: 'stretch',
-    alignItems: 'center',
-  },
-  text: {
-    marginVertical: 5,
-  },
-  textError: {
-    color: 'red',
-  },
-  submitButton: {
-    alignSelf: 'stretch',
-  },
-});
