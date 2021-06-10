@@ -8,7 +8,7 @@ import {ImageThumbnail} from '../../components';
 import {store} from '../../store';
 import {setImagesAction} from '../../store/images/actions';
 
-const NUMBER_OF_IMAGES = 2;
+const NUMBER_OF_IMAGES = 5;
 
 export interface UploadPhotosFormValues {
   photos: (ImageRequestData | null)[];
